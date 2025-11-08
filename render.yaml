@@ -1,0 +1,48 @@
+services:
+  - type: web
+    name: email-onebox-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: onebox-db
+          property: connectionString
+      - key: ELASTICSEARCH_NODE
+        sync: false
+      - key: EMAIL_1_ADDRESS
+        sync: false
+      - key: EMAIL_1_PASSWORD
+        sync: false
+      - key: EMAIL_1_IMAP_HOST
+        value: imap.gmail.com
+      - key: EMAIL_1_IMAP_PORT
+        value: 993
+      - key: EMAIL_2_ADDRESS
+        sync: false
+      - key: EMAIL_2_PASSWORD
+        sync: false
+      - key: EMAIL_2_IMAP_HOST
+        value: imap.gmail.com
+      - key: EMAIL_2_IMAP_PORT
+        value: 993
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: SLACK_WEBHOOK_URL
+        sync: false
+      - key: QDRANT_URL
+        sync: false
+
+databases:
+  - name: onebox-db
+    databaseName: onebox
+    user: onebox_user
+    plan: free
+    postgresMajorVersion: 16
+

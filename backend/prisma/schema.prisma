@@ -1,0 +1,111 @@
+// Prisma schema for metadata storage
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model EmailAccount {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  imapHost    String
+  imapPort    Int
+  password    String   // Should be encrypted in production
+  isActive    Boolean  @default(true)
+  lastSyncAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  emails      Email[]
+  folders     EmailFolder[]
+}
+
+model EmailFolder {
+  id              String   @id @default(uuid())
+  name            String
+  emailAccountId  String
+  emailAccount    EmailAccount @relation(fields: [emailAccountId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  
+  emails          Email[]
+  
+  @@unique([emailAccountId, name])
+}
+
+model Email {
+  id              String   @id @default(uuid())
+  messageId       String   @unique
+  emailAccountId  String
+  folderId        String?
+  
+  from            String
+  to              String
+  subject         String
+  body            String   @db.Text
+  htmlBody        String?  @db.Text
+  date            DateTime
+  
+  // AI Categorization
+  category        EmailCategory?
+  categoryConfidence Float?
+  
+  // Flags
+  isRead          Boolean  @default(false)
+  isFlagged       Boolean  @default(false)
+  isReplied       Boolean  @default(false)
+  
+  // Integration tracking
+  slackNotified   Boolean  @default(false)
+  webhookTriggered Boolean @default(false)
+  
+  // Relations
+  emailAccount    EmailAccount @relation(fields: [emailAccountId], references: [id], onDelete: Cascade)
+  folder          EmailFolder? @relation(fields: [folderId], references: [id])
+  suggestedReplies SuggestedReply[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([emailAccountId])
+  @@index([folderId])
+  @@index([category])
+  @@index([date])
+}
+
+enum EmailCategory {
+  INTERESTED
+  MEETING_BOOKED
+  NOT_INTERESTED
+  SPAM
+  OUT_OF_OFFICE
+  UNCATEGORIZED
+}
+
+model SuggestedReply {
+  id          String   @id @default(uuid())
+  emailId     String
+  email       Email    @relation(fields: [emailId], references: [id], onDelete: Cascade)
+  
+  suggestion  String   @db.Text
+  confidence  Float
+  context     String?  @db.Text
+  
+  isUsed      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  
+  @@index([emailId])
+}
+
+model ProductContext {
+  id          String   @id @default(uuid())
+  title       String
+  content     String   @db.Text
+  vectorId    String?  // ID in vector database
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+

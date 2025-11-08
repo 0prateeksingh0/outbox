@@ -1,0 +1,298 @@
+{
+  "info": {
+    "_postman_id": "reachinbox-onebox",
+    "name": "ReachInbox Onebox API",
+    "description": "Complete API collection for ReachInbox Onebox",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "emailId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "accountId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Emails",
+      "item": [
+        {
+          "name": "List Emails",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.length > 0) {",
+                  "    pm.environment.set('emailId', response.data[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/emails?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["emails"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" },
+                { "key": "accountId", "value": "", "disabled": true },
+                { "key": "category", "value": "", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Email Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/emails/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["emails", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Get Single Email",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/emails/{{emailId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["emails", "{{emailId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Email (Mark as Read)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isRead\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/emails/{{emailId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["emails", "{{emailId}}"]
+            }
+          }
+        },
+        {
+          "name": "Generate Reply Suggestion",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/emails/{{emailId}}/reply-suggestions",
+              "host": ["{{baseUrl}}"],
+              "path": ["emails", "{{emailId}}", "reply-suggestions"]
+            }
+          }
+        },
+        {
+          "name": "Get Reply Suggestions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/emails/{{emailId}}/reply-suggestions",
+              "host": ["{{baseUrl}}"],
+              "path": ["emails", "{{emailId}}", "reply-suggestions"]
+            }
+          }
+        },
+        {
+          "name": "Re-categorize Email",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/emails/{{emailId}}/recategorize",
+              "host": ["{{baseUrl}}"],
+              "path": ["emails", "{{emailId}}", "recategorize"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Accounts",
+      "item": [
+        {
+          "name": "List Accounts",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.length > 0) {",
+                  "    pm.environment.set('accountId', response.data[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accounts",
+              "host": ["{{baseUrl}}"],
+              "path": ["accounts"]
+            }
+          }
+        },
+        {
+          "name": "Get Single Account",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accounts/{{accountId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["accounts", "{{accountId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Account Folders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accounts/{{accountId}}/folders",
+              "host": ["{{baseUrl}}"],
+              "path": ["accounts", "{{accountId}}", "folders"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "item": [
+        {
+          "name": "Search Emails",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/search?q=meeting",
+              "host": ["{{baseUrl}}"],
+              "path": ["search"],
+              "query": [
+                { "key": "q", "value": "meeting" },
+                { "key": "accountId", "value": "", "disabled": true },
+                { "key": "category", "value": "", "disabled": true },
+                { "key": "page", "value": "1", "disabled": true },
+                { "key": "limit", "value": "10", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/search/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["search", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test Workflows",
+      "item": [
+        {
+          "name": "Complete Test Flow",
+          "item": [
+            {
+              "name": "1. Health Check",
+              "request": {
+                "method": "GET",
+                "url": "http://localhost:3000/health"
+              }
+            },
+            {
+              "name": "2. List Accounts",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/accounts"
+              }
+            },
+            {
+              "name": "3. List Emails",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/emails?page=1&limit=5"
+              }
+            },
+            {
+              "name": "4. Search Emails",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/search?q=test"
+              }
+            },
+            {
+              "name": "5. Get Email Details",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/emails/{{emailId}}"
+              }
+            },
+            {
+              "name": "6. Generate Reply",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/emails/{{emailId}}/reply-suggestions"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
