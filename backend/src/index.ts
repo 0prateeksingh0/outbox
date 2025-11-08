@@ -52,15 +52,23 @@ async function startServer() {
     await initializeDatabase();
     logger.info('✓ Database connections established');
 
-    // Initialize Elasticsearch
-    const elasticsearchService = ElasticsearchService.getInstance();
-    await elasticsearchService.initialize();
-    logger.info('✓ Elasticsearch initialized');
+    // Initialize Elasticsearch (optional)
+    try {
+      const elasticsearchService = ElasticsearchService.getInstance();
+      await elasticsearchService.initialize();
+      logger.info('✓ Elasticsearch initialized');
+    } catch (error) {
+      logger.warn('⚠ Elasticsearch not available, search features will be limited');
+    }
 
-    // Start IMAP synchronization service
-    const imapService = IMAPSyncService.getInstance();
-    await imapService.startSync();
-    logger.info('✓ IMAP sync service started');
+    // Start IMAP synchronization service (optional)
+    try {
+      const imapService = IMAPSyncService.getInstance();
+      await imapService.startSync();
+      logger.info('✓ IMAP sync service started');
+    } catch (error) {
+      logger.warn('⚠ IMAP sync service not started, email sync will be unavailable');
+    }
 
     // Start Express server
     app.listen(PORT, () => {
