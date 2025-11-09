@@ -1,110 +1,143 @@
 # 📧 Email Onebox Aggregator
 
-A production-ready email aggregation system with real-time IMAP synchronization, AI-powered categorization, and intelligent search capabilities.
+A feature-rich email aggregator with AI-powered categorization, real-time IMAP sync, and intelligent search.
 
-## 🎯 Features
+## 🚀 Live Demo
 
-### Core Features
-- ✅ **Real-Time IMAP Sync** - Persistent connections with IDLE mode (no polling!)
-- ✅ **Elasticsearch Search** - Full-text search with filters and aggregations
-- ✅ **AI Categorization** - Smart email classification (OpenAI + fallback)
-- ✅ **Slack Integration** - Automatic notifications for interested leads
-- ✅ **Modern UI** - Beautiful Next.js interface with Tailwind CSS
-- ✅ **RAG Replies** - AI-powered reply suggestions with vector search
-
-### Technical Stack
-- **Backend:** Node.js 18+, TypeScript, Express, Prisma
-- **Frontend:** Next.js 14, React 18, Tailwind CSS
-- **Database:** PostgreSQL (metadata), Elasticsearch (search), Qdrant (vectors)
-- **AI:** OpenAI (GPT-4o-mini, embeddings)
-- **Infrastructure:** Docker Compose
+- **Frontend**: https://outbox.vercel.app
+- **Backend API**: https://outbox-b10k.onrender.com
+- **Health Check**: https://outbox-b10k.onrender.com/health
 
 ---
 
-## 📂 Project Structure
+## ✨ Features
 
-```
-outbox/
-├── backend/              # Node.js + Express API
-│   ├── src/
-│   │   ├── config/      # Database, email config
-│   │   ├── routes/      # API endpoints
-│   │   ├── services/    # Business logic
-│   │   └── index.ts     # Entry point
-│   ├── prisma/          # Database schema
-│   ├── package.json
-│   └── README.md
-├── frontend/             # Next.js UI
-│   ├── src/
-│   │   ├── app/         # Next.js 14 app router
-│   │   ├── components/  # React components
-│   │   └── lib/         # Utilities
-│   ├── package.json
-│   └── README.md
-├── docker-compose.yml    # Local development services
-├── render.yaml           # Render deployment config
-├── vercel.json           # Vercel deployment config
-├── DEPLOYMENT.md         # Deployment guide
-└── README.md             # This file
-```
+- ✅ **Real-time Email Sync** - IMAP IDLE mode for instant email updates
+- ✅ **Multi-Account Support** - Sync multiple Gmail accounts
+- ✅ **AI Categorization** - Auto-categorize emails (Interested, Meeting Booked, Not Interested, Spam, Out of Office)
+- ✅ **Smart Search** - Elasticsearch-powered full-text search
+- ✅ **AI Reply Suggestions** - RAG-based intelligent reply generation
+- ✅ **Slack Integration** - Notifications for important emails
+- ✅ **Webhook Support** - Trigger external automation
+- ✅ **Modern UI** - Clean Next.js interface with Tailwind CSS
+
+---
+
+## 🏗️ Tech Stack
+
+### Backend
+- **Node.js** + **TypeScript** + **Express**
+- **PostgreSQL** (Prisma ORM) - Email metadata storage
+- **Elasticsearch** - Full-text search and indexing
+- **Qdrant** - Vector database for RAG
+- **OpenAI GPT-4o-mini** - AI categorization
+- **IMAP** - Real-time email synchronization
+
+### Frontend
+- **Next.js 14** + **React** + **TypeScript**
+- **Tailwind CSS** - Styling
+- **React Query** - Data fetching and caching
+
+### Infrastructure
+- **Docker Compose** - Local development environment
+- **Render** - Backend hosting
+- **Vercel** - Frontend hosting
 
 ---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+
-- Docker & Docker Compose
+- Node.js 18+ and npm
+- Docker and Docker Compose
 - Gmail account with App Password
 
-### 1. Clone & Install
-
+### 1. Clone Repository
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/0prateeksingh0/outbox.git
 cd outbox
-
-# Start Docker services
-docker-compose up -d
-
-# Install backend dependencies
-cd backend
-npm install
 ```
 
-### 2. Configure Environment
+### 2. Start Infrastructure
+```bash
+docker-compose up -d
+```
+
+This starts:
+- PostgreSQL (port 5432)
+- Elasticsearch (port 9200)
+- Qdrant (port 6333)
+
+### 3. Setup Backend
+```bash
+cd backend
+
+# Install dependencies
+npm install
+
+# Create .env file
+cp .env.example .env
+
+# Edit .env with your credentials
+# Add: DATABASE_URL, OPENAI_API_KEY, EMAIL_ACCOUNTS, SLACK_WEBHOOK_URL
+
+# Run database migrations
+npx prisma migrate dev
+
+# Start backend
+npm run dev
+```
+
+Backend runs on http://localhost:3000
+
+### 4. Setup Frontend
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Create .env.local
+echo "NEXT_PUBLIC_API_URL=http://localhost:3000" > .env.local
+
+# Start frontend
+npm run dev
+```
+
+Frontend runs on http://localhost:3001
+
+---
+
+## 🔧 Configuration
+
+### Backend Environment Variables
 
 Create `backend/.env`:
 
 ```env
-PORT=3000
-NODE_ENV=development
-
 # Database
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/onebox_db
+DATABASE_URL="postgresql://user:password@localhost:5432/onebox"
+
+# Search & Vector DB
 ELASTICSEARCH_NODE=http://localhost:9200
 QDRANT_URL=http://localhost:6333
 
-# Email Account 1
-EMAIL_1_ADDRESS=your-email@gmail.com
-EMAIL_1_PASSWORD=your-app-password
-EMAIL_1_IMAP_HOST=imap.gmail.com
-EMAIL_1_IMAP_PORT=993
+# AI
+OPENAI_API_KEY=your-openai-api-key
 
-# Email Account 2 (optional)
-EMAIL_2_ADDRESS=another-email@gmail.com
-EMAIL_2_PASSWORD=another-app-password
-EMAIL_2_IMAP_HOST=imap.gmail.com
-EMAIL_2_IMAP_PORT=993
+# Notifications
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+WEBHOOK_URL=https://webhook.site/your-unique-url
 
-# AI & Integrations
-OPENAI_API_KEY=sk-...
-SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
-EXTERNAL_WEBHOOK_URL=https://webhook.site/...
+# Email Accounts (JSON format)
+EMAIL_ACCOUNTS=[{"email":"user@gmail.com","password":"app-password","host":"imap.gmail.com","port":993}]
 
-# Context (for RAG)
-PRODUCT_CONTEXT="Your product information"
-OUTREACH_AGENDA="Your outreach strategy"
+# App Config
+NODE_ENV=development
+PORT=3000
 ```
+
+### Frontend Environment Variables
 
 Create `frontend/.env.local`:
 
@@ -112,301 +145,186 @@ Create `frontend/.env.local`:
 NEXT_PUBLIC_API_URL=http://localhost:3000
 ```
 
-### 3. Setup Database
+---
 
-```bash
-cd backend
-npx prisma generate
-npx prisma db push
+## 📦 Project Structure
+
 ```
-
-### 4. Start Services
-
-```bash
-# Option A: Use start script (from root)
-./start-all.sh
-
-# Option B: Manual start
-# Terminal 1 - Backend
-cd backend
-npm run dev
-
-# Terminal 2 - Frontend
-cd frontend
-npm install
-npm run dev
+outbox/
+├── backend/                # Backend API
+│   ├── src/
+│   │   ├── config/        # Database & email config
+│   │   ├── routes/        # API routes
+│   │   ├── services/      # Business logic (IMAP, AI, Search)
+│   │   └── utils/         # Utilities
+│   ├── prisma/            # Database schema
+│   └── package.json
+├── frontend/              # Frontend UI
+│   ├── src/
+│   │   ├── app/          # Next.js app router
+│   │   ├── components/   # React components
+│   │   └── lib/          # API client
+│   └── package.json
+├── docker-compose.yml     # Local infrastructure
+├── render.yaml           # Render deployment config
+└── vercel.json          # Vercel deployment config
 ```
-
-### 5. Access Application
-
-- **Frontend:** http://localhost:3001
-- **Backend API:** http://localhost:3000
-- **API Docs:** http://localhost:3000/api/docs
 
 ---
 
-## 📖 Documentation
+## 🌐 Deployment
 
-- [**DEPLOYMENT.md**](./DEPLOYMENT.md) - Production deployment guide
-- [**API.md**](./API.md) - API endpoints documentation
-- [**ARCHITECTURE.md**](./ARCHITECTURE.md) - System architecture
-- [**backend/README.md**](./backend/README.md) - Backend documentation
-- [**frontend/README.md**](./frontend/README.md) - Frontend documentation
+### Deploy Backend to Render
+
+1. Push code to GitHub
+2. Connect repository to Render
+3. Render auto-detects `render.yaml`
+4. Set environment variables
+5. Deploy!
+
+**Root Directory**: `backend`
+
+### Deploy Frontend to Vercel
+
+1. Connect repository to Vercel
+2. Set **Root Directory** to `frontend`
+3. Add environment variable: `NEXT_PUBLIC_API_URL=https://your-backend.onrender.com`
+4. Deploy!
 
 ---
 
-## 🎬 Demo
+## 🔌 API Endpoints
 
-### Features Demonstration
+### Health
+- `GET /health` - Health check
 
-1. **Email Synchronization**
-   - Connects to 2 Gmail accounts
-   - Syncs last 30 days of emails
-   - Real-time IDLE mode for instant updates
+### Emails
+- `GET /api/emails` - List emails
+- `GET /api/emails/:id` - Get email details
+- `POST /api/emails/:id/reply-suggestions` - Get AI reply suggestions
+- `PUT /api/emails/:id/category` - Update email category
 
-2. **Search & Filter**
-   - Full-text search across subject/body
-   - Filter by account, category, folder
-   - Instant Elasticsearch results
+### Accounts
+- `GET /api/accounts` - List email accounts
+- `POST /api/accounts` - Add email account
 
-3. **AI Categorization**
-   - Automatically categorizes into 5 types:
-     - INTERESTED, MEETING_BOOKED, NOT_INTERESTED, SPAM, OUT_OF_OFFICE
-   - Triggers Slack notifications for INTERESTED emails
-
-4. **Beautiful UI**
-   - Modern, responsive design
-   - Real-time statistics
-   - Email detail view with reply suggestions
+### Search
+- `GET /api/search?q=query` - Search emails
+- `GET /api/search?category=INTERESTED` - Filter by category
 
 ---
 
 ## 🧪 Testing
 
-### API Testing (Postman)
-
+### Test Backend
 ```bash
-# Health check
-GET http://localhost:3000/health
-
-# List accounts
-GET http://localhost:3000/api/accounts
-
-# Get emails
-GET http://localhost:3000/api/emails?limit=20
-
-# Search
-GET http://localhost:3000/api/search?q=meeting
-
-# Get stats
-GET http://localhost:3000/api/emails/stats
+curl http://localhost:3000/health
+curl http://localhost:3000/api/emails
 ```
 
-### Frontend Testing
-
-1. Open http://localhost:3001
-2. View synced emails
-3. Test search functionality
-4. Filter by categories
-5. Click email for details
+### Test Frontend
+Open http://localhost:3001 in your browser
 
 ---
 
-## 🚢 Deployment
-
-### Production Deployment (Vercel + Render)
-
-**Backend → Render.com**
-- Free PostgreSQL included
-- Auto-deploy from GitHub
-- See [DEPLOYMENT.md](./DEPLOYMENT.md)
-
-**Frontend → Vercel**
-- Optimized Next.js hosting
-- Global CDN
-- Zero configuration
-
-**Cost:** Free tier available!
-
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
-
----
-
-## 🛠️ Development
-
-### Backend Scripts
-
-```bash
-cd backend
-npm run dev          # Development server
-npm run build        # Build TypeScript
-npm start            # Production server
-npm run prisma:studio # Database GUI
-```
-
-### Frontend Scripts
-
-```bash
-cd frontend
-npm run dev          # Development server
-npm run build        # Production build
-npm start            # Production server
-```
-
----
-
-## 📊 Tech Stack Details
+## 📝 Development
 
 ### Backend
-- **Runtime:** Node.js 18+
-- **Framework:** Express.js
-- **Language:** TypeScript
-- **ORM:** Prisma
-- **Email:** imap, mailparser
-- **Search:** @elastic/elasticsearch
-- **AI:** OpenAI, Anthropic
-- **Vector DB:** Qdrant
-- **Notifications:** Slack Webhook, Axios
+```bash
+cd backend
+npm run dev        # Start dev server with hot reload
+npm run build      # Build for production
+npm start          # Start production server
+```
 
 ### Frontend
-- **Framework:** Next.js 14 (App Router)
-- **UI Library:** React 18
-- **Styling:** Tailwind CSS
-- **State Management:** React Query
-- **Language:** TypeScript
-
-### Infrastructure
-- **Database:** PostgreSQL 16
-- **Search:** Elasticsearch 8.11
-- **Vector Store:** Qdrant
-- **Containerization:** Docker Compose
-
----
-
-## 🔒 Security
-
-- Environment variables for secrets
-- App passwords for Gmail
-- CORS configuration
-- Input validation
-- SQL injection protection (Prisma)
-- Rate limiting ready
-
----
-
-## 📝 Environment Setup Guide
-
-### Gmail App Passwords
-
-1. Enable 2-Factor Authentication
-2. Go to Google Account → Security → App Passwords
-3. Generate password for "Mail"
-4. Use in `EMAIL_X_PASSWORD`
-
-### Slack Webhook
-
-1. Go to Slack → Apps → Incoming Webhooks
-2. Create new webhook
-3. Copy URL to `SLACK_WEBHOOK_URL`
-
-### OpenAI API Key
-
-1. Go to platform.openai.com
-2. Create API key
-3. Add $5-10 credit
-4. Copy to `OPENAI_API_KEY`
-
----
-
-## 🐛 Troubleshooting
-
-### Docker services not starting
 ```bash
-docker-compose down
-docker-compose up -d
-docker ps  # Check status
-```
-
-### Backend connection errors
-```bash
-# Check .env file
-cat backend/.env
-
-# Verify database connection
-cd backend
-npx prisma studio
-```
-
-### Frontend not connecting
-```bash
-# Check API URL
-cat frontend/.env.local
-
-# Test backend
-curl http://localhost:3000/health
+cd frontend
+npm run dev        # Start dev server
+npm run build      # Build for production
+npm start          # Start production server
 ```
 
 ---
 
-## 📈 Performance
+## 🤝 Gmail Setup
 
-- **Email Sync:** Real-time with IMAP IDLE
-- **Search:** <100ms with Elasticsearch
-- **API Response:** <200ms average
-- **Frontend:** Server-side rendering with Next.js
+1. Enable 2-Factor Authentication on your Google account
+2. Go to https://myaccount.google.com/apppasswords
+3. Generate App Password
+4. Use the 16-character password in `EMAIL_ACCOUNTS` config
 
 ---
 
-## 🎓 Learning Resources
+## 📊 Features Overview
 
-- [IMAP Protocol](https://tools.ietf.org/html/rfc3501)
-- [Elasticsearch Guide](https://www.elastic.co/guide/)
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Prisma Docs](https://www.prisma.io/docs)
+### AI Email Categorization
+Uses OpenAI GPT-4o-mini to categorize emails into:
+- **Interested** - Shows interest, requests info
+- **Meeting Booked** - Meeting confirmed
+- **Not Interested** - Clear rejection
+- **Spam** - Promotional/irrelevant
+- **Out of Office** - Auto-reply
+
+### Real-time Sync
+- IMAP IDLE mode for instant updates
+- Syncs last 30 days of emails
+- Supports multiple accounts
+- No polling, true push notifications
+
+### Smart Search
+- Full-text search powered by Elasticsearch
+- Filter by account, folder, category
+- Fast and scalable
+
+### AI Reply Suggestions
+- RAG (Retrieval-Augmented Generation)
+- Context-aware responses
+- Powered by Qdrant + OpenAI
+
+---
+
+## 🛠️ Troubleshooting
+
+### Backend won't start
+- Check Docker services are running: `docker-compose ps`
+- Verify DATABASE_URL is correct
+- Check logs: `npm run dev`
+
+### Frontend can't connect to backend
+- Verify NEXT_PUBLIC_API_URL is set
+- Check backend is running on correct port
+- Check CORS settings
+
+### Email sync not working
+- Verify Gmail App Password is correct
+- Check IMAP settings (host, port)
+- Review backend logs for errors
 
 ---
 
 ## 📄 License
 
-MIT License - feel free to use for your projects!
+MIT License - see LICENSE file for details
 
 ---
 
-## 👥 Contributing
+## 👨‍💻 Author
 
-This is a demo project for ReachInbox assignment. For production use:
+Built by Prateek Singh
 
-1. Add comprehensive error handling
-2. Implement rate limiting
-3. Add user authentication
-4. Set up monitoring/logging
-5. Add comprehensive tests
+- GitHub: [@0prateeksingh0](https://github.com/0prateeksingh0)
+- Email: prateeksingh0605@gmail.com
 
 ---
 
-## 🎉 Acknowledgments
+## 🙏 Acknowledgments
 
-Built as part of the ReachInbox Backend Engineering assignment.
-
-**Features Implemented:**
-1. ✅ Real-Time IMAP Synchronization
-2. ✅ Elasticsearch Integration
-3. ✅ AI-Based Categorization
-4. ✅ Slack & Webhook Integration
-5. ✅ Frontend Interface
-6. ✅ AI-Powered Reply Suggestions (RAG)
+- OpenAI for GPT API
+- Elastic for search capabilities
+- Render & Vercel for hosting
+- Next.js & React teams
 
 ---
 
-## 📞 Support
-
-For questions or issues:
-1. Check [DEPLOYMENT.md](./DEPLOYMENT.md)
-2. Review logs: `tail -f backend.log` or `tail -f frontend.log`
-3. Verify environment variables
-4. Test with Postman collection
-
----
-
-**Built with ❤️ using Node.js, TypeScript, Next.js, and AI**
-# outbox
+**⭐ Star this repo if you find it useful!**
