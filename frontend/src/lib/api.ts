@@ -14,6 +14,7 @@ export const emailsApi = {
   list: (params?: any) => api.get('/emails', { params }),
   get: (id: string) => api.get(`/emails/${id}`),
   update: (id: string, data: any) => api.patch(`/emails/${id}`, data),
+  updateCategory: (id: string, category: string) => api.put(`/emails/${id}/category`, { category }),
   getStats: (accountId?: string) => api.get('/emails/stats', { params: { accountId } }),
   getReplySuggestions: (id: string) => api.get(`/emails/${id}/reply-suggestions`),
   generateReplySuggestion: (id: string) => api.post(`/emails/${id}/reply-suggestions`),

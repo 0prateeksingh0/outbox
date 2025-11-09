@@ -54,6 +54,16 @@ export function EmailDetail({ emailId }: EmailDetailProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['emails'] })
       queryClient.invalidateQueries({ queryKey: ['email', emailId] })
+      queryClient.invalidateQueries({ queryKey: ['stats'] })
+    },
+  })
+
+  const updateCategoryMutation = useMutation({
+    mutationFn: (category: string) => emailsApi.updateCategory(emailId, category),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['emails'] })
+      queryClient.invalidateQueries({ queryKey: ['email', emailId] })
+      queryClient.invalidateQueries({ queryKey: ['stats'] })
     },
   })
 
@@ -137,29 +147,43 @@ export function EmailDetail({ emailId }: EmailDetailProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          {email.category && (
-            <span
+          <div className="flex items-center gap-2">
+            <label htmlFor="category-select" className="text-sm font-medium text-gray-700">
+              Category:
+            </label>
+            <select
+              id="category-select"
+              value={email.category || 'UNCATEGORIZED'}
+              onChange={(e) => updateCategoryMutation.mutate(e.target.value)}
+              disabled={updateCategoryMutation.isPending}
               className={clsx(
-                'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium',
-                getCategoryColor(email.category)
+                'px-3 py-1 rounded-lg text-sm font-medium border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500',
+                getCategoryColor(email.category),
+                updateCategoryMutation.isPending && 'opacity-50 cursor-not-allowed'
               )}
             >
-              {email.category.replace('_', ' ')}
-              {email.categoryConfidence && (
-                <span className="ml-1 opacity-70">
-                  ({Math.round(email.categoryConfidence * 100)}%)
-                </span>
-              )}
-            </span>
-          )}
+              <option value="UNCATEGORIZED">Uncategorized</option>
+              <option value="INTERESTED">Interested</option>
+              <option value="MEETING_BOOKED">Meeting Booked</option>
+              <option value="NOT_INTERESTED">Not Interested</option>
+              <option value="SPAM">Spam</option>
+              <option value="OUT_OF_OFFICE">Out of Office</option>
+            </select>
+            {email.categoryConfidence && (
+              <span className="text-xs text-gray-500">
+                ({Math.round(email.categoryConfidence * 100)}%)
+              </span>
+            )}
+          </div>
 
           <button
             onClick={() => recategorizeMutation.mutate()}
             disabled={recategorizeMutation.isPending}
             className="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50"
+            title="Re-categorize with AI"
           >
             <RefreshCw className={clsx('w-3 h-3', recategorizeMutation.isPending && 'animate-spin')} />
-            Re-categorize
+            AI Re-categorize
           </button>
         </div>
       </div>
