@@ -158,6 +158,35 @@ emailRouter.patch('/:id', async (req: Request, res: Response) => {
   }
 });
 
+emailRouter.put('/:id/category', async (req: Request, res: Response) => {
+  try {
+    const { category } = req.body;
+    
+    const validCategories = ['INTERESTED', 'MEETING_BOOKED', 'NOT_INTERESTED', 'SPAM', 'OUT_OF_OFFICE', 'UNCATEGORIZED'];
+    
+    if (!validCategories.includes(category)) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Invalid category' 
+      });
+    }
+    
+    const email = await prisma.email.update({
+      where: { id: req.params.id },
+      data: { category },
+    });
+    
+    res.json({ success: true, data: email });
+    
+  } catch (error) {
+    logger.error('Failed to update category:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to update category' 
+    });
+  }
+});
+
 emailRouter.post('/:id/reply-suggestions', async (req: Request, res: Response) => {
   try {
     const email = await prisma.email.findUnique({
